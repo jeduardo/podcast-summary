@@ -4,7 +4,7 @@ This is a simple podcast summarizer that uses the Gemini API to summarize podcas
 
 ## Prerequisites
 
-- Node.js (v14 or later)
+- Node.js (v22 or later)
 - npm (Node Package Manager)
 
 ## Installation
