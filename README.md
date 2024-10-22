@@ -1,10 +1,10 @@
-# Podcast summarizer
+# Podcast Summary
 
-This is a simple podcast summarizer that uses the Gemini API to summarize the podcast.
+This is a simple podcast summarizer that uses the Gemini API to summarize podcasts.
 
 ## Prerequisites
 
-- Node.js (v20 or later)
+- Node.js (v14 or later)
 - npm (Node Package Manager)
 
 ## Installation
@@ -20,11 +20,11 @@ This is a simple podcast summarizer that uses the Gemini API to summarize the po
 export GEMINI_API_KEY="YOUR_GEMINI_API_KEY"
 ```
 
-2. Run the script:
+2. Run the script with a URL as an argument:
 
 ```shell
-chmod u+x podcast_summarizer.js
-./podcast_summarizer.js <url>
+chmod u+x podcast-summary.js
+./podcast-summary.js <url>
 ```
 
 ## Dependencies
