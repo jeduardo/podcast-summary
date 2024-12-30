@@ -1,10 +1,10 @@
 {
-  "name": "podcast-summarizer",
+  "name": "podcast-summary",
   "version": "1.0.0",
   "description": "A simple podcast summarizer using Gemini API",
-  "main": "podcast_summarizer.js",
+  "main": "podcast-summary.js",
   "scripts": {
-    "start": "node podcast_summarizer.js"
+    "start": "node podcast-summary.js"
   },
   "dependencies": {
     "@google-ai/generativelanguage": "^0.2.0",

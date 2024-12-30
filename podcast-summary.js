@@ -17,11 +17,27 @@ async function extractContent(url) {
 // Function to summarize content using Google Gemini AI
 async function summarizeWithGemini(content, apiKey) {
     const genAI = new GoogleGenerativeAI(apiKey);
-    // const model_name = "gemini-1.5-flash";
-    const model_name = "gemini-1.5-pro";
+    const model_name = "gemini-pro";
     const model = genAI.getGenerativeModel({ model: model_name });
 
-    const prompt = `Summarize the key points of the following podcast transcript:\n\n${content}`;
+    const prompt = `Please analyze this podcast transcript and provide:
+
+1. Key Discussion Points (3-5 main topics)
+   - Brief description of each point (2-3 sentences)
+   - Why this point matters in the broader context
+
+2. Notable Insights
+   - Key quotes or memorable statements
+   - Practical takeaways or actionable items
+
+3. Context & Relevance
+   - How this discussion connects to current trends/issues
+   - Who would find this information most valuable
+
+Format each point concisely but include enough detail to understand the core message and its significance.
+
+Transcript:
+${content}`;
 
     const result = await model.generateContent(prompt);
 
