@@ -1,6 +1,6 @@
 # Podcast Summary
 
-This is a simple podcast summarizer that uses the Gemini API to summarize podcasts.
+This is a simple podcast summarizer using the Gemini API.
 
 ## Prerequisites
 
