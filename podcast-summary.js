@@ -17,7 +17,7 @@ async function extractContent(url) {
 // Function to summarize content using Google Gemini AI
 async function summarizeWithGemini(content, apiKey) {
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model_name = "gemini-pro";
+    const model_name = "gemini-2.5-flash-preview-04-17";
     const model = genAI.getGenerativeModel({ model: model_name });
 
     const prompt = `Please analyze this podcast transcript and provide:
