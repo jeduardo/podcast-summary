@@ -3,8 +3,9 @@
 import { promises as fs } from 'fs';
 import { Command } from 'commander';
 
-import { scrape } from './lib/web.js';
+import { scrape, download } from './lib/web.js';
 import { summarize, transcribe, generateFilename } from './lib/ai.js';
+import path from 'path';
 
 const DEFAULT_MODEL_NAME = 'gemini-2.5-flash-preview-04-17';
 
@@ -66,6 +67,8 @@ function collectInput() {
 
 async function main() {
   const opts = collectInput();
+  let downloadedAudio = false;
+  let fileName = null;
 
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
@@ -73,22 +76,40 @@ async function main() {
   }
 
   let content = null;
+  let audioPath = opts.audio;
+
+  // If audio is a URL, download it first
+  if (
+    audioPath &&
+    (audioPath.startsWith('http://') || audioPath.startsWith('https://'))
+  ) {
+    audioPath = await download(audioPath);
+    downloadedAudio = true;
+    opts.audio = audioPath;
+    opts.transcription = null; // Clear transcription option
+  }
 
   if (opts.audio) {
-    console.log(
-      `Transcribing audio file ${opts.audio} with Gemini (${opts.model}), this can take a while...`
-    );
     let metadata = null;
     if (opts.metadata) {
       console.log(`Adding transcription metadata from ${opts.metadata}...`);
       metadata = await scrape(opts.metadata);
     }
+    console.log(
+      `Transcribing audio file ${opts.audio} with Gemini (${opts.model}), this can take a while...`
+    );
     content = await transcribe(apiKey, opts.model, opts.audio, metadata);
   } else if (opts.transcription) {
     console.log(
       `Extracting transcription from the URL... ${opts.transcription}`
     );
     content = await scrape(opts.transcription);
+  }
+
+  if (opts.save) {
+    const filename = await generateFilename(apiKey, opts.model, content);
+    await fs.writeFile(filename, content);
+    console.log(`Transcription saved to: ${filename}`);
   }
 
   console.log(
@@ -100,19 +121,27 @@ async function main() {
   console.log(summary);
 
   if (opts.save) {
-    console.log('');
-    const transcriptionName = await generateFilename(
-      apiKey,
-      opts.model,
-      content
-    );
-
-    await fs.writeFile(transcriptionName, content);
-    console.log(`Transcription saved to: ${transcriptionName}`);
-
-    const summaryName = transcriptionName.replace(/\.md$/, '-summary.md');
+    const summaryName = filename.replace(/\.md$/, '-summary.md');
     await fs.writeFile(summaryName, summary);
     console.log(`Summary saved to: ${summaryName}`);
+
+    // If we downloaded an audio file and want to save it, rename it to match our naming scheme
+    if (downloadedAudio) {
+      const extension = path.extname(opts.audio);
+      const audioFilename = filename.replace(/\.md$/, extension);
+      await fs.rename(downloadedFiles[0], audioFilename);
+      console.log(`Audio file saved to: ${audioFilename}`);
+    }
+  } else if (downloadedAudio) {
+    // Clean up any temporary downloaded audio file
+    try {
+      await fs.unlink(opts.audio);
+    } catch (err) {
+      console.error(
+        `Warning: Could not delete temporary file ${opts.audio}:`,
+        err
+      );
+    }
   }
 }
 
