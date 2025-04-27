@@ -3,16 +3,35 @@
   "version": "1.0.0",
   "description": "A simple podcast summarizer using Gemini API",
   "main": "podcast-summary.js",
+  "type": "module",
   "scripts": {
-    "start": "node podcast-summary.js"
+    "start": "node podcast-summary.js",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json,css,md}": [
+      "prettier --write",
+      "git add"
+    ]
   },
   "dependencies": {
-    "@google-ai/generativelanguage": "^3.1.0",
-    "@google/generative-ai": "^0.21.0",
+    "@google/genai": "^0.10.0",
     "@mozilla/readability": "^0.6.0",
     "axios": "^1.9.0",
-    "google-auth-library": "^8.7.0",
-    "jsdom": "^20.0.0"
+    "commander": "^13.1.0",
+    "jsdom": "^20.0.0",
+    "mime": "^4.0.7"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.1",
+    "prettier": "^3.5.3"
+  }
 }

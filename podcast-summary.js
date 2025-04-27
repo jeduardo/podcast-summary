@@ -1,70 +1,100 @@
 #!/usr/bin/env node
 
-const axios = require('axios');
-const { JSDOM } = require('jsdom');
-const { Readability } = require('@mozilla/readability');
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+import { Command } from 'commander';
 
-// Function to fetch and extract the main content from a URL
-async function extractContent(url) {
-    const response = await axios.get(url);
-    const dom = new JSDOM(response.data);
-    const reader = new Readability(dom.window.document);
-    const article = reader.parse();
-    return article.textContent;
+import { scrape } from './lib/web.js';
+import { summarize, transcribe } from './lib/ai.js';
+
+const DEFAULT_MODEL_NAME = 'gemini-2.5-flash-preview-04-17';
+
+function collectInput() {
+  const program = new Command();
+  program
+    .name('podcast-summary')
+    .description('Summarize a podcast out of a transcription or audio file')
+    .version('1.0.0')
+    .helpOption('-h, --help', 'display help for command')
+    .addHelpText(
+      'afterAll',
+      `
+  Examples:
+    $ podcast-tool --help
+    $ podcast-tool --url https://example.com/transcript.json
+    $ podcast-tool --audio episode.mp3 --metadata https://example.com/meta.json
+  `
+    );
+
+  program
+    .option(
+      '--transcription <url>',
+      'URL of a podcast transcription to be summarized'
+    )
+    .option('--audio <path>', 'Path to an audio file to be transcribed')
+    .option(
+      '--metadata <url>',
+      'URL for extra metadata to use when transcribing (only valid with --audio)'
+    )
+    .option(
+      '--model <model>',
+      'Model to use for summarization',
+      DEFAULT_MODEL_NAME
+    );
+
+  if (process.argv.length <= 2) {
+    program.outputHelp();
+    process.exit(0);
+  }
+  program.parse(process.argv);
+
+  const opts = program.opts();
+
+  if (!opts.transcription && !opts.audio) {
+    console.error('Error: you must pass either --url or --audio');
+    process.exit(1);
+  }
+  if (opts.metadata && !opts.audio) {
+    console.error(
+      'Error: --metadata can only be used when you also pass --audio'
+    );
+    process.exit(1);
+  }
+
+  return opts;
 }
 
-// Function to summarize content using Google Gemini AI
-async function summarizeWithGemini(content, apiKey) {
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model_name = "gemini-2.5-flash-preview-04-17";
-    const model = genAI.getGenerativeModel({ model: model_name });
-
-    const prompt = `Please analyze this podcast transcript and provide:
-
-1. Key Discussion Points (3-5 main topics)
-   - Brief description of each point (2-3 sentences)
-   - Why this point matters in the broader context
-
-2. Notable Insights
-   - Key quotes or memorable statements
-   - Practical takeaways or actionable items
-
-3. Context & Relevance
-   - How this discussion connects to current trends/issues
-   - Who would find this information most valuable
-
-Format each point concisely but include enough detail to understand the core message and its significance.
-
-Transcript:
-${content}`;
-
-    const result = await model.generateContent(prompt);
-
-    return result.response.text();
-}
-
-// Main function
 async function main() {
-    const url = process.argv[2];
-    if (!url) {
-        throw new Error("Please provide a URL as a command-line argument");
+  const opts = collectInput();
+
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error('GEMINI_API_KEY environment variable is not set');
+  }
+
+  let content = null;
+
+  if (opts.audio) {
+    console.log(
+      `Transcribing audio file ${opts.audio} with Gemini (${opts.model}), this can take a while...`
+    );
+    let metadata = null;
+    if (opts.metadata) {
+      console.log(`Adding transcription metadata from ${opts.metadata}...`);
+      metadata = await scrape(opts.metadata);
     }
-    
-    const apiKey = process.env.GEMINI_API_KEY;
-    
-    if (!apiKey) {
-        throw new Error("GEMINI_API_KEY environment variable is not set");
-    }
+    content = await transcribe(apiKey, opts.model, opts.audio, metadata);
+  } else if (opts.transcription) {
+    console.log(
+      `Extracting transcription from the URL... ${opts.transcription}`
+    );
+    content = await scrape(opts.transcription);
+  }
 
-    console.log(`Extracting content from the website... ${url}`);
-    const content = await extractContent(url);
+  console.log(
+    `Summarizing content with Gemini (${opts.model}), this can take a while...`
+  );
+  const summary = await summarize(apiKey, opts.model, content);
 
-    console.log("Summarizing content with Google Gemini AI...");
-    const summary = await summarizeWithGemini(content, apiKey);
-
-    console.log("\nPodcast Summary:");
-    console.log(summary);
+  console.log(summary);
 }
 
 main().catch(console.error);

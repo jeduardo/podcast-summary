@@ -32,4 +32,4 @@ chmod u+x podcast-summary.js
 - axios: For making HTTP requests
 - jsdom: For parsing HTML
 - @mozilla/readability: For extracting main content from web pages
-- @google-ai/generativelanguage: For interacting with Google's Gemini AI
+- @google-ai/genai: For interacting with Google's Gemini AI
