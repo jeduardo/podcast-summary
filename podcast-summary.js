@@ -14,14 +14,14 @@ function collectInput() {
   program
     .name('podcast-summary')
     .description('Summarize a podcast out of a transcription or audio file')
-    .version('1.0.0')
+    .version('0.0.1')
     .helpOption('-h, --help', 'display help for command')
     .addHelpText(
       'afterAll',
       `
   Examples:
     $ podcast-tool --help
-    $ podcast-tool --url https://example.com/transcript.json
+    $ podcast-tool --transcription https://example.com/transcript.json
     $ podcast-tool --audio episode.mp3 --metadata https://example.com/meta.json
   `
     );
@@ -52,7 +52,7 @@ function collectInput() {
   const opts = program.opts();
 
   if (!opts.transcription && !opts.audio) {
-    console.error('Error: you must pass either --url or --audio');
+    console.error('Error: you must pass either --transcription or --audio');
     process.exit(1);
   }
   if (opts.metadata && !opts.audio) {
@@ -68,7 +68,7 @@ function collectInput() {
 async function main() {
   const opts = collectInput();
   let downloadedAudio = false;
-  let fileName = null;
+  let filename = null;
 
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
@@ -107,7 +107,7 @@ async function main() {
   }
 
   if (opts.save) {
-    const filename = await generateFilename(apiKey, opts.model, content);
+    filename = await generateFilename(apiKey, opts.model, content);
     await fs.writeFile(filename, content);
     console.log(`Transcription saved to: ${filename}`);
   }
@@ -129,7 +129,7 @@ async function main() {
     if (downloadedAudio) {
       const extension = path.extname(opts.audio);
       const audioFilename = filename.replace(/\.md$/, extension);
-      await fs.rename(downloadedFiles[0], audioFilename);
+      await fs.rename(opts.audio, audioFilename);
       console.log(`Audio file saved to: ${audioFilename}`);
     }
   } else if (downloadedAudio) {

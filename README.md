@@ -1,10 +1,11 @@
 # Podcast Summary
 
-This is a simple podcast summarizer using the Gemini API.
+This is a podcast summarizer using the Gemini models from Google. It allows you to summarizing
+podcasts out of transcriptions or audio files.
 
 ## Prerequisites
 
-- Node.js (v22 or later)
+- Node.js (v20 or later)
 - npm (Node Package Manager)
 
 ## Installation
@@ -26,8 +27,11 @@ export GEMINI_API_KEY="YOUR_GEMINI_API_KEY"
 # Summarize from a transcription URL
 ./podcast-summary.js --transcription https://example.com/transcript.html
 
-# Transcribe and summarize an audio file
+# Transcribe and summarize a local audio file
 ./podcast-summary.js --audio episode.mp3
+
+# Transcribe and summarize a remote audio file
+./podcast-summary.js --audio https://example.com/episode.mp3
 
 # Transcribe with additional metadata
 ./podcast-summary.js --audio episode.mp3 --metadata https://example.com/meta.html
@@ -42,7 +46,7 @@ export GEMINI_API_KEY="YOUR_GEMINI_API_KEY"
 ## Options
 
 - `--transcription <url>`: URL of a podcast transcription to be summarized
-- `--audio <path>`: Path to an audio file to be transcribed
+- `--audio <path>|<url>`: Path or URL to an audio file to be transcribed
 - `--metadata <url>`: URL for extra metadata to use when transcribing (only valid with --audio)
 - `--model <model>`: Model to use for summarization (default: gemini-2.5-flash-preview-04-17)
 - `--save`: Save the summary to a markdown file (will be saved as `<podcast-title>-summary.md`)
