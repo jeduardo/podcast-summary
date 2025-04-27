@@ -1,6 +1,6 @@
 {
   "name": "podcast-summary",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "A simple podcast summarizer using Gemini API",
   "main": "podcast-summary.js",
   "type": "module",
