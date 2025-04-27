@@ -1,13 +1,16 @@
 #!/usr/bin/env node
 
 import { promises as fs } from 'fs';
+import path from 'path';
 import { Command } from 'commander';
-
+import { marked } from 'marked';
+import { markedTerminal } from 'marked-terminal';
 import { scrape, download } from './lib/web.js';
 import { summarize, transcribe, generateFilename } from './lib/ai.js';
-import path from 'path';
 
 const DEFAULT_MODEL_NAME = 'gemini-2.5-flash-preview-04-17';
+
+marked.use(markedTerminal());
 
 function collectInput() {
   const program = new Command();
@@ -118,7 +121,7 @@ async function main() {
   const summary = await summarize(apiKey, opts.model, content);
   console.log('Summary generated successfully!');
   console.log('Summary:');
-  console.log(summary);
+  console.log(marked(summary));
 
   if (opts.save) {
     const summaryName = filename.replace(/\.md$/, '-summary.md');
