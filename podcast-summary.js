@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 
+import { promises as fs } from 'fs';
 import { Command } from 'commander';
 
 import { scrape } from './lib/web.js';
-import { summarize, transcribe } from './lib/ai.js';
+import { summarize, transcribe, generateFilename } from './lib/ai.js';
 
 const DEFAULT_MODEL_NAME = 'gemini-2.5-flash-preview-04-17';
 
@@ -38,7 +39,8 @@ function collectInput() {
       '--model <model>',
       'Model to use for summarization',
       DEFAULT_MODEL_NAME
-    );
+    )
+    .option('--save', 'Save the transcription and summary to Markdown files');
 
   if (process.argv.length <= 2) {
     program.outputHelp();
@@ -93,8 +95,25 @@ async function main() {
     `Summarizing content with Gemini (${opts.model}), this can take a while...`
   );
   const summary = await summarize(apiKey, opts.model, content);
-
+  console.log('Summary generated successfully!');
+  console.log('Summary:');
   console.log(summary);
+
+  if (opts.save) {
+    console.log('');
+    const transcriptionName = await generateFilename(
+      apiKey,
+      opts.model,
+      content
+    );
+
+    await fs.writeFile(transcriptionName, content);
+    console.log(`Transcription saved to: ${transcriptionName}`);
+
+    const summaryName = transcriptionName.replace(/\.md$/, '-summary.md');
+    await fs.writeFile(summaryName, summary);
+    console.log(`Summary saved to: ${summaryName}`);
+  }
 }
 
 main().catch(console.error);
