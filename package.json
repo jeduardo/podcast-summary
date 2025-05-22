@@ -1,8 +1,13 @@
 {
   "name": "podcast-summary",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "A simple podcast summarizer using Gemini API",
   "main": "podcast-summary.js",
+  "homepage": "https://github.com/jeduardo/podcast-summarizer#readme",
+  "license": "MIT",
+  "bin": {
+    "podcast-summary": "./podcast-summary.js"
+  },
   "type": "module",
   "scripts": {
     "start": "node podcast-summary.js",
@@ -30,7 +35,6 @@
     "marked-terminal": "^7.3.0",
     "mime": "^4.0.7"
   },
-  "license": "MIT",
   "devDependencies": {
     "husky": "^9.1.7",
     "lint-staged": "^15.5.1",
