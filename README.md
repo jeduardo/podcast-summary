@@ -1,4 +1,4 @@
-# Podcast Summary
+# Podcast Summarizer
 
 This is a podcast summarizer using the Gemini models from Google. It allows you to summarizing
 podcasts out of transcriptions or audio files.
@@ -12,6 +12,7 @@ podcasts out of transcriptions or audio files.
 
 1. Clone this repository
 2. Run `npm install` to install the dependencies
+3. Run `npm link` to make the binary widely-available for usage
 
 ## Usage
 
@@ -25,22 +26,22 @@ export GEMINI_API_KEY="YOUR_GEMINI_API_KEY"
 
 ```shell
 # Summarize from a transcription URL
-./podcast-summary.js --transcription https://example.com/transcript.html
+podcast-summary --transcription https://example.com/transcript.html
 
 # Transcribe and summarize a local audio file
-./podcast-summary.js --audio episode.mp3
+podcast-summary --audio episode.mp3
 
 # Transcribe and summarize a remote audio file
-./podcast-summary.js --audio https://example.com/episode.mp3
+podcast-summary --audio https://example.com/episode.mp3
 
 # Transcribe with additional metadata
-./podcast-summary.js --audio episode.mp3 --metadata https://example.com/meta.html
+podcast-summary --audio episode.mp3 --metadata https://example.com/meta.html
 
 # Save the summary to a markdown file
-./podcast-summary.js --transcription https://example.com/transcript.html --save
+podcast-summary --transcription https://example.com/transcript.html --save
 
 # Use a different Gemini model
-./podcast-summary.js --transcription https://example.com/transcript.html --model "gemini-2.5-pro"
+podcast-summary --transcription https://example.com/transcript.html --model "gemini-2.5-pro"
 ```
 
 ## Options
@@ -51,11 +52,3 @@ export GEMINI_API_KEY="YOUR_GEMINI_API_KEY"
 - `--model <model>`: Model to use for summarization (default: gemini-2.5-flash-preview-04-17)
 - `--save`: Save the summary to a markdown file (will be saved as `<podcast-title>-summary.md`)
 - `--help`: Display help information
-
-## Dependencies
-
-- axios: For making HTTP requests
-- jsdom: For parsing HTML
-- @mozilla/readability: For extracting main content from web pages
-- @google-ai/genai: For interacting with Google's Gemini AI
-- commander: For command-line argument parsing

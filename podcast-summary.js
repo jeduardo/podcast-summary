@@ -7,6 +7,7 @@ import { marked } from 'marked';
 import { markedTerminal } from 'marked-terminal';
 import { scrape, download } from './lib/web.js';
 import { summarize, transcribe, generateFilename } from './lib/ai.js';
+import pkg from './package.json' with { type: 'json' };
 
 const DEFAULT_MODEL_NAME = 'gemini-2.5-flash-preview-04-17';
 
@@ -17,15 +18,15 @@ function collectInput() {
   program
     .name('podcast-summary')
     .description('Summarize a podcast out of a transcription or audio file')
-    .version('0.0.1')
+    .version(pkg.version)
     .helpOption('-h, --help', 'display help for command')
     .addHelpText(
       'afterAll',
       `
   Examples:
-    $ podcast-tool --help
-    $ podcast-tool --transcription https://example.com/transcript.json
-    $ podcast-tool --audio episode.mp3 --metadata https://example.com/meta.json
+    $ podcast-summary --help
+    $ podcast-summary --transcription https://example.com/transcript.json
+    $ podcast-summary --audio episode.mp3 --metadata https://example.com/meta.json
   `
     );
 
