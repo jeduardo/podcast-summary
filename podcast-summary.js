@@ -9,7 +9,7 @@ import { scrape, download } from './lib/web.js';
 import { summarize, transcribe, generateFilename } from './lib/ai.js';
 import pkg from './package.json' with { type: 'json' };
 
-const DEFAULT_MODEL_NAME = 'gemini-2.5-flash-preview-04-17';
+const DEFAULT_MODEL_NAME = 'gemini-2.5-flash';
 
 marked.use(markedTerminal());
 
